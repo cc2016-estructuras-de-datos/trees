@@ -19,11 +19,28 @@ class SplayTree:
         """Inserta un proceso. La implementacion completa se agregara en la siguiente fase."""
         raise NotImplementedError("SplayTree.insert() se implementara despues.")
 
-    def search(self, pid: int) -> tuple[SplayNode | None, int]:
+    def search(self, vruntime: float) -> tuple[SplayNode | None, int]:
         """
-        Busca un proceso por PID.
+        Busca un proceso por vruntime.
         Retorna (node, iterations) — iterations cuenta las comparaciones desde la raiz.
         Despues de una busqueda exitosa, el nodo se sube a la raiz con splay.
         La implementacion completa se agregara en una fase posterior.
         """
-        raise NotImplementedError("SplayTree.search() se implementara despues.")
+        iterations = 0
+        current = self.root
+        found_node: SplayNode | None = None
+ 
+        while current is not None:
+            iterations += 1
+            if vruntime == current.process.vruntime:
+                found_node = current
+                break
+            elif vruntime < current.process.vruntime:
+                current = current.left
+            else:
+                current = current.right
+ 
+        if found_node is not None:
+            self._splay(found_node)
+ 
+        return found_node, iterations

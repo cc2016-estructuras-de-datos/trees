@@ -29,10 +29,22 @@ class RedBlackTree:
             "RedBlackTree.insert() con rotaciones se implementara despues."
         )
  
-    def search(self, pid: int) -> tuple[RBNode | None, int]:
+    def search(self, vruntime: float) -> tuple[RBNode | None, int]:
         """
         Busca un proceso por PID.
         Retorna (node, iterations) — iterations cuenta las comparaciones desde la raiz.
         La implementacion completa se agregara en una fase posterior.
         """
-        raise NotImplementedError("RedBlackTree.search() se implementara despues.")
+        iterations = 0
+        current = self.root
+ 
+        while current is not self.NIL and current is not None:
+            iterations += 1
+            if vruntime == current.process.vruntime:
+                return current, iterations
+            elif vruntime < current.process.vruntime:
+                current = current.left
+            else:
+                current = current.right
+ 
+        return None, iterations
