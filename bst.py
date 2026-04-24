@@ -12,12 +12,27 @@ class BST:
         self.root: BSTNode | None = None
  
     def insert(self, process: Process) -> None:
-        """Inserta un proceso. La implementacion completa se agregara en la siguiente fase."""
-        raise NotImplementedError("BST.insert() se implementara despues.")
+        """Inserta un proceso en el árbol basado en su vruntime."""
+        new_node = BSTNode(process)
+        if self.root is None:
+            self.root = new_node
+            return
+        current = self.root
+        while True:
+            if process.vruntime < current.process.vruntime:
+                if current.left is None:
+                    current.left = new_node
+                    return
+                current = current.left
+            else:
+                if current.right is None:
+                    current.right = new_node
+                    return
+                current = current.right
  
     def search(self, vruntime: float) -> tuple[BSTNode | None, int]:
         """
-        Busca un proceso por PID.
+        Busca un proceso por vruntime.
         Retorna (node, iterations) — iterations cuenta las comparaciones desde la raiz.
         La implementacion completa se agregara en una fase posterior.
         """

@@ -19,19 +19,116 @@ class RedBlackTree:
     """
  
     def __init__(self):
-        # Centinela NIL: hoja negra compartida usada en lugar de None.
         self.NIL: RBNode = RBNode(process=None, color=BLACK)
         self.root: RBNode = self.NIL
  
+    def _rotate_left(self, node: RBNode) -> None:
+        right_child = node.right
+        node.right = right_child.left
+        if right_child.left is not self.NIL:
+            right_child.left.parent = node
+        right_child.parent = node.parent
+        if node.parent is None:
+            self.root = right_child
+        elif node is node.parent.left:
+            node.parent.left = right_child
+        else:
+            node.parent.right = right_child
+        right_child.left = node
+        node.parent = right_child
+ 
+    def _rotate_right(self, node: RBNode) -> None:
+        left_child = node.left
+        node.left = left_child.right
+        if left_child.right is not self.NIL:
+            left_child.right.parent = node
+        left_child.parent = node.parent
+        if node.parent is None:
+            self.root = left_child
+        elif node is node.parent.right:
+            node.parent.right = left_child
+        else:
+            node.parent.left = left_child
+        left_child.right = node
+        node.parent = left_child
+ 
+    def _insert_fixup(self, node: RBNode) -> None:
+        """Restaura las invariantes del árbol rojo-negro después de la inserción."""
+        while node.parent is not None and node.parent.color == RED:
+            parent = node.parent
+            grandparent = parent.parent
+            if grandparent is None:
+                break
+            if parent is grandparent.left:
+                uncle = grandparent.right
+                if uncle.color == RED:
+                    parent.color = BLACK
+                    uncle.color = BLACK
+                    grandparent.color = RED
+                    node = grandparent
+                else:
+                    if node is parent.right:
+                        node = parent
+                        self._rotate_left(node)
+                        parent = node.parent
+                        grandparent = parent.parent
+                    parent.color = BLACK
+                    grandparent.color = RED
+                    self._rotate_right(grandparent)
+            else:
+                uncle = grandparent.left
+                if uncle.color == RED:
+                    parent.color = BLACK
+                    uncle.color = BLACK
+                    grandparent.color = RED
+                    node = grandparent
+                else:
+                    if node is parent.left:
+                        node = parent
+                        self._rotate_right(node)
+                        parent = node.parent
+                        grandparent = parent.parent
+                    parent.color = BLACK
+                    grandparent.color = RED
+                    self._rotate_left(grandparent)
+        self.root.color = BLACK
+ 
     def insert(self, process: Process) -> None:
-        """Inserta un proceso. La implementacion completa con ajuste se agregara en la siguiente fase."""
-        raise NotImplementedError(
-            "RedBlackTree.insert() con rotaciones se implementara despues."
-        )
+        """Inserta un proceso en el árbol basado en su vruntime, manteniendo las propiedades"""
+        new_node = RBNode(process, color=RED)
+        new_node.left = self.NIL
+        new_node.right = self.NIL
+ 
+        parent: RBNode | None = None
+        current = self.root
+ 
+        while current is not self.NIL:
+            parent = current
+            if process.vruntime < current.process.vruntime:
+                current = current.left
+            else:
+                current = current.right
+ 
+        new_node.parent = parent
+ 
+        if parent is None:
+            self.root = new_node
+        elif process.vruntime < parent.process.vruntime:
+            parent.left = new_node
+        else:
+            parent.right = new_node
+ 
+        if new_node.parent is None:
+            new_node.color = BLACK
+            return
+        if new_node.parent.parent is None:
+            return
+ 
+        self._insert_fixup(new_node)
  
     def search(self, vruntime: float) -> tuple[RBNode | None, int]:
         """
-        Busca un proceso por PID.
+        Busca un proceso por vruntime.
         Retorna (node, iterations) — iterations cuenta las comparaciones desde la raiz.
         La implementacion completa se agregara en una fase posterior.
         """
